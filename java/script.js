@@ -1,61 +1,89 @@
-class Question {
-    constructor(question){
-        this.questionElement = document.querySelector ('#question');
-        this.answerElements = [
-            document.querySelector('#a1'),
-            document.querySelector('#a2'),
-            document.querySelector('#a3'),
-            document.querySelector('#a4'),
-        ];
-    
-        this.correctAnswer = question.correct_answer:
-        this.question = question.question;
-        this.isCorrect = false;
-        
-        this.answers = this.shuffleAnswers ([
-            question.correct_answer,
-            ...question.incorrect_answers
-        ]);
-    }
 
-    shuffleAnswers(answers) {
-        for (let i = answers.length - 1; i > 0; i--){
-            const j = Math.floor(Math.random() * i)
-            const temp = answers[i]
-            answers[i] = answers[j]
-            answers[j] = temp
-        }
-        return answers;
-    }
+const Questions = [{
+    q: "What is capital of Illinois?",
+    a: [{ text: "Chicago", isCorrect: false },
+    { text: "Aurora", isCorrect: false },
+    { text: "Springfield", isCorrect: true },
+    { text: "Springbrook", isCorrect: false }
+    ]
 
-    answer(checkedElement) {
-        this.isCorrect = (checkedElement[0].textContent === this.correctAnswer) ? true :
-        false;
-    }
+},
+{
+    q: "What is the Tallest Tower in Chicago?",
+    a: [{ text: "Hancock Building", isCorrect: false, isSelected: false },
+    { text: "The Drake", isCorrect: false },
+    { text: "Trump Tower", isCorrect: false },
+    { text: "Sears Tower", isCorrect: true }
+    ]
 
-    render() {
-        this.questionElement.innerHTML = thisquestion;
-        this.answerElements.forEach ((el,index) => {
-            el.innerHTML = '<input type="radio" name="radio"><span class="checkmark"></span>' +
-            this.answers[index];
-        });
+},
+{
+    q: "What is my cars name?",
+    a: [{ text: "Ghallager", isCorrect: false },
+    { text: "Sam", isCorrect: false },
+    { text: "Roxy", isCorrect: true },
+    { text: "Riot", isCorrect: false }
+    ]
+
+}
+
+]
+
+let currQuestion = 0
+let score = 0
+
+function loadQues() {
+    const question = document.getElementById("ques")
+    const opt = document.getElementById("opt")
+
+    question.textContent = Questions[currQuestion].q;
+    opt.innerHTML = ""
+
+    for (let i = 0; i < Questions[currQuestion].a.length; i++) {
+        const choicesdiv = document.createElement("div");
+        const choice = document.createElement("input");
+        const choiceLabel = document.createElement("label");
+
+        choice.type = "radio";
+        choice.name = "answer";
+        choice.value = i;
+
+        choiceLabel.textContent = Questions[currQuestion].a[i].text;
+
+        choicesdiv.appendChild(choice);
+        choicesdiv.appendChild(choiceLabel);
+        opt.appendChild(choicesdiv);
     }
 }
 
-export default Question;
+loadQues();
 
-class Final {
-    constructor(count, totalAmount) {
-      this.scoreElement = document.querySelector('.score');
-      this.againButton = document.querySelector('#again');
-      this.render(count, totalAmount);
-      this.againButton.addEventListener('click', location.reload.bind(location));
+function loadScore() {
+    const totalScore = document.getElementById("score")
+    totalScore.textContent = `You scored ${score} out of ${Questions.length}`
+}
+
+
+function nextQuestion() {
+    if (currQuestion < Questions.length - 1) {
+        currQuestion++;
+        loadQues();
+    } else {
+        document.getElementById("opt").remove()
+        document.getElementById("ques").remove()
+        document.getElementById("btn").remove()
+        loadScore();
     }
-    render(count, totalAmount) {
-      this.scoreElement.innerHTML = `You answered ${count} out of ${totalAmount} correct!`;
+}
+
+function checkAns() {
+    const selectedAns = parseInt(document.querySelector('input[name="answer"]:checked').value);
+
+    if (Questions[currQuestion].a[selectedAns].isCorrect) {
+        score++;
+        console.log("Correct")
+        nextQuestion();
+    } else {
+        nextQuestion();
     }
-  }
-  export default Final;
-
-
-  
+}
